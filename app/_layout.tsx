@@ -10,6 +10,12 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/components/useColorScheme";
+import { StatusBar } from "expo-status-bar";
+import {
+  // useFonts,
+  Poppins_400Regular,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -25,23 +31,26 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
+  // const [loaded, error] = useFonts({
+  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  //   ...FontAwesome.font,
+  // });
+  let [fontsLoaded, fontError] = useFonts({
+    Poppins_400Regular,
+    Poppins_700Bold,
   });
-
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+    if (fontError) throw fontError;
+  }, [fontError]);
 
   useEffect(() => {
-    if (loaded) {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded]);
 
-  if (!loaded) {
+  if (!fontsLoaded) {
     return null;
   }
 
@@ -53,7 +62,16 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      {/* <StatusBar barStyle="dark-content" /> */}
       <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="login/index"
+          options={{
+            headerTitle: "Login",
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name="index"
           options={{ headerTitle: "Home", headerShown: false }}
@@ -62,8 +80,22 @@ function RootLayoutNav() {
           name="register/index"
           options={{ headerTitle: "Sign Up" }}
         />
-        <Stack.Screen name="login/index" options={{ headerTitle: "Login" }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="category/index"
+          options={{ headerTitle: "Category" }}
+        />
+        <Stack.Screen
+          name="category/[id]"
+          options={{ headerTitle: "Pet Details" }}
+        />
+        <Stack.Screen
+          name="adoption form/index"
+          options={{ headerTitle: "Adoption Form" }}
+        />
+        <Stack.Screen
+          name="foster form/index"
+          options={{ headerTitle: "Foster Form" }}
+        />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       </Stack>
     </ThemeProvider>

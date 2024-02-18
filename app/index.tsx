@@ -6,31 +6,35 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
-import { Link, useNavigation } from "expo-router";
+import { Link, Redirect, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const IntroScreen = () => {
-  const navigate = useNavigation();
-  return (
-    <SafeAreaView style={styles.container}>
-      <Image
-        source={require("../assets/images/intro_image.png")}
-        style={{ width: 300, height: 300 }}
-      />
-      <Text style={styles.heading}>Pet Connect</Text>
-      <Text style={styles.subHeading}>Find your perfect furry friend</Text>
+  const navigation = useNavigation();
+  const handlePress = () => {
+    navigation.navigate("register/index" as never);
+  };
+  // return (
+  //   <SafeAreaView style={styles.container}>
+  //     <Image
+  //       source={require("../assets/images/intro_image.png")}
+  //       style={{ width: 300, height: 300 }}
+  //     />
+  //     <Text style={styles.heading}>Pet Connect</Text>
+  //     <Text style={styles.subHeading}>Find your perfect furry friend</Text>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Get Started</Text>
-      </TouchableOpacity>
-      {/* <Link href="/register/" style={styles.link}>
-        <Text style={styles.linkText}>Go to Signup screen!</Text>
-      </Link>
-      <Link href="/(tabs)/">
-        <Text style={styles.linkText}>Go to Tabs!</Text>
-      </Link> */}
-    </SafeAreaView>
-  );
+  //     <TouchableOpacity style={styles.button} onPress={handlePress}>
+  //       <Text style={styles.buttonText}>Get Started</Text>
+  //     </TouchableOpacity>
+  //     {/* <Link href="/register/" style={styles.link}>
+  //       <Text style={styles.linkText}>Go to Signup screen!</Text>
+  //     </Link>
+  //     <Link href="/(tabs)/">
+  //       <Text style={styles.linkText}>Go to Tabs!</Text>
+  //     </Link> */}
+  //   </SafeAreaView>
+  // );
+  return <Redirect href={"/(tabs)/home"} />;
 };
 
 export default IntroScreen;
