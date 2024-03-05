@@ -12,11 +12,74 @@ import {
   FontAwesome,
   FontAwesome5,
   MaterialCommunityIcons,
+  AntDesign,
 } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
 const Home = () => {
   const router = useRouter();
+  const [currentUserWishlistedPets, setCurrentUserWishlistedPets] =
+    React.useState([]);
+  // Fetch wishlisted items for the current user when the component mounts
+  React.useEffect(() => {
+    async function fetchCurrentUserWishlistedPets() {
+      try {
+        // Replace "currentUser" with the actual user identifier (e.g., user ID or username)
+        const storedCurrentUserWishlistedPets = await AsyncStorage.getItem(
+          "currentUserWishlistedPets",
+        );
+        if (storedCurrentUserWishlistedPets) {
+          setCurrentUserWishlistedPets(
+            JSON.parse(storedCurrentUserWishlistedPets),
+          );
+          console.log(JSON.parse(storedCurrentUserWishlistedPets));
+        }
+      } catch (error) {
+        console.error("Error fetching current user's wishlisted pets:", error);
+      }
+    }
+
+    fetchCurrentUserWishlistedPets();
+  }, []);
+
+  const isPetWishlistedByCurrentUser = (pet: any) => {
+    return currentUserWishlistedPets.some((p: any) => p.id === pet.id);
+  };
+
+  const handleWishlist = (pet: any): any => {
+    // Check if the pet is already wishlisted by the current user
+    const isWishlisted = isPetWishlistedByCurrentUser(pet);
+
+    if (!isWishlisted) {
+      // If not wishlisted, add to the current user's wishlist
+      const updatedCurrentUserWishlist: any = [
+        ...currentUserWishlistedPets,
+        pet,
+      ];
+      setCurrentUserWishlistedPets(updatedCurrentUserWishlist);
+
+      // Store the updated current user's wishlist in AsyncStorage
+      AsyncStorage.setItem(
+        "currentUserWishlistedPets",
+        JSON.stringify(updatedCurrentUserWishlist),
+      );
+    } else {
+      // If already wishlisted, remove from the current user's wishlist
+      const updatedCurrentUserWishlist = currentUserWishlistedPets.filter(
+        (p: any) => p.id !== pet.id,
+      );
+      setCurrentUserWishlistedPets(updatedCurrentUserWishlist);
+
+      // Store the updated current user's wishlist in AsyncStorage
+      AsyncStorage.setItem(
+        "currentUserWishlistedPets",
+        JSON.stringify(updatedCurrentUserWishlist),
+      );
+    }
+  };
+
   const popularPets = [
     {
       id: 1,
@@ -137,13 +200,15 @@ const Home = () => {
     },
     // Add more categories as needed
   ];
+
   return (
     <SafeAreaView>
+      <ExpoStatusBar style="dark" />
       <ScrollView style={{ padding: 10 }}>
         <Text style={styles.heading}>Popular Pets</Text>
 
-        {popularPets.map((item) => (
-          <Pressable style={styles.popularPetCard}>
+        {popularPets.map((item,index) => (
+          <Pressable style={styles.popularPetCard} key={index}>
             <Image source={item.image} style={styles.popularPetImage} />
             <View
               style={{
@@ -152,12 +217,24 @@ const Home = () => {
                 borderColor: "gray",
                 borderWidth: 1,
                 borderTopWidth: 0,
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "white",
               }}
             >
-              <Text style={styles.popularPetName}>{item.name}</Text>
-              <Text style={styles.popularPetCategory}>
-                {item.breed} | {item.age}
-              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.popularPetName}>{item.name}</Text>
+                <Text style={styles.popularPetCategory}>
+                  {item.breed} | {item.age}
+                </Text>
+              </View>
+              <Pressable onPress={() => handleWishlist(item)}>
+                {isPetWishlistedByCurrentUser(item) ? (
+                  <AntDesign name="heart" size={24} color="red" />
+                ) : (
+                  <AntDesign name="hearto" size={24} color="black" />
+                )}
+              </Pressable>
             </View>
           </Pressable>
         ))}

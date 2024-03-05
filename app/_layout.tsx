@@ -61,7 +61,8 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    // <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       {/* <StatusBar barStyle="dark-content" /> */}
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -95,6 +96,10 @@ function RootLayoutNav() {
         <Stack.Screen
           name="foster form/index"
           options={{ headerTitle: "Foster Form" }}
+        />
+        <Stack.Screen
+          name="pet form/index"
+          options={{ headerTitle: "Pet Addition Form" }}
         />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       </Stack>

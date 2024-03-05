@@ -8,6 +8,8 @@ import {
 import React from "react";
 import { Link, Redirect, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Provider } from "react-redux";
+import { store } from "@/redux/store";
 
 const IntroScreen = () => {
   const navigation = useNavigation();
@@ -34,7 +36,12 @@ const IntroScreen = () => {
   //     </Link> */}
   //   </SafeAreaView>
   // );
-  return <Redirect href={"/(tabs)/home"} />;
+
+  return (
+    <Provider store={store}>
+      <Redirect href={"/(tabs)/home"} />
+    </Provider>
+  );
 };
 
 export default IntroScreen;
