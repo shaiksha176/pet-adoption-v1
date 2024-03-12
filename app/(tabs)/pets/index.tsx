@@ -9,8 +9,11 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useSelector } from "react-redux";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useLazyGetPetsUploadedByUserQuery } from "@/redux/api/petApiSlice";
+import { AppDispatch } from "@/redux/store";
+import { setUserPets } from "@/redux/features/pets/petSlice";
 
 interface UploadedBy {
   _id: string;
@@ -63,16 +66,71 @@ const NoPets: React.FC = () => {
 };
 
 const PetList: React.FC = () => {
-  return <Text>Pet List</Text>;
+  const userPets = useSelector((state: any) => state.pets.uploadedPets);
+  useFocusEffect(() => {
+    userPets[0];
+  });
+  return (
+    <View>
+      {userPets.map((item: any, index: number) => (
+        <Pressable style={styles.popularPetCard} key={index}>
+          <Image
+            source={{ uri: item.images[0] }}
+            style={styles.popularPetImage}
+          />
+          <View
+            style={{
+              padding: 10,
+              borderStyle: "solid",
+              borderColor: "gray",
+              borderWidth: 1,
+              borderTopWidth: 0,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "white",
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={styles.popularPetName}>{item.name}</Text>
+              <Text style={styles.popularPetCategory}>
+                {item.size} | {item.age}
+              </Text>
+            </View>
+          </View>
+        </Pressable>
+      ))}
+    </View>
+  );
 };
 
 const Pets: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const [pets, setPets] = useState<Pet[] | []>([]);
   const userInfo = useSelector((state: any) => state.auth.user);
+  const userUploadedPets = useSelector((state: any) => state.pets.uploadedPets);
+  const [
+    getPetsUploadedByUser,
+    { data: petsUploadedByUser, isLoading, isError, isSuccess },
+  ] = useLazyGetPetsUploadedByUserQuery();
+
   useEffect(() => {
-    console.log(userInfo);
+    if (!userInfo) return;
+    const fetchUserPets = async () => {
+      await getPetsUploadedByUser(userInfo.id).unwrap();
+      console.log({ isSuccess, isError, isLoading });
+      if (isSuccess) {
+        dispatch(setUserPets(petsUploadedByUser));
+      }
+    };
+    fetchUserPets();
   }, []);
+
+  useFocusEffect(() => {
+    console.log(userInfo);
+    // console.log(userUploadedPets);
+    // console.log({ isSuccess, isError, isLoading });
+  });
 
   const navigateToPetAdditionScreen = () => {
     router.push("/pet form/");
@@ -109,7 +167,7 @@ const Pets: React.FC = () => {
           </Pressable>
         </View>
 
-        {!pets.length ? <NoPets /> : <PetList />}
+        {!userUploadedPets?.length ? <NoPets /> : <PetList />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -131,4 +189,22 @@ const styles = StyleSheet.create({
     color: "orange",
   },
   cardContainer: {},
+  popularPetCard: {
+    // marginRight: 16,
+
+    marginBottom: 20,
+  },
+  popularPetImage: {
+    width: "100%",
+    height: 150,
+    // marginBottom: 10,
+  },
+  popularPetName: {
+    fontSize: 18,
+    fontFamily: "Poppins_400Regular",
+  },
+  popularPetCategory: {
+    fontSize: 16,
+    // textAlign: "center",
+  },
 });
