@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FontAwesome,
   FontAwesome5,
@@ -18,8 +18,10 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
+import { useSelector } from "react-redux";
 const Home = () => {
   const router = useRouter();
+  const user = useSelector((state: any) => state.auth.user);
   const [currentUserWishlistedPets, setCurrentUserWishlistedPets] =
     React.useState([]);
   // Fetch wishlisted items for the current user when the component mounts
@@ -34,7 +36,7 @@ const Home = () => {
           setCurrentUserWishlistedPets(
             JSON.parse(storedCurrentUserWishlistedPets),
           );
-          console.log(JSON.parse(storedCurrentUserWishlistedPets));
+          // console.log(JSON.parse(storedCurrentUserWishlistedPets));
         }
       } catch (error) {
         console.error("Error fetching current user's wishlisted pets:", error);
@@ -207,7 +209,7 @@ const Home = () => {
       <ScrollView style={{ padding: 10 }}>
         <Text style={styles.heading}>Popular Pets</Text>
 
-        {popularPets.map((item,index) => (
+        {popularPets.map((item, index) => (
           <Pressable style={styles.popularPetCard} key={index}>
             <Image source={item.image} style={styles.popularPetImage} />
             <View
@@ -256,6 +258,7 @@ const Home = () => {
                   params: { id: category.id, name: category.name },
                 });
               }}
+              key={index}
             >
               <View
                 style={{

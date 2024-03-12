@@ -13,6 +13,10 @@ import {
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/features/user/authSlice";
+import { AppDispatch } from "@/redux/store";
+
 const authStatus = false;
 // Sample data for the user
 const userData = {
@@ -28,6 +32,11 @@ const userData = {
 
 const Profile = () => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const handleLogout = async () => {
+    await dispatch(logout()); // Dispatch the logout action creator
+    router.replace("/login/");
+  };
   return (
     <SafeAreaView style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
       <Text
@@ -68,30 +77,7 @@ const Profile = () => {
           Edit Profile
         </Text>
       </Pressable>
-      {/* <View>
-        <Text style={{ fontSize: 20, marginBottom: 10 }}>
-          Adoption/Fostering History
-        </Text>
-        <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>
-          <Image
-            source={require("../../../assets/images/puppy.jpg")}
-            style={styles.petImage}
-          />
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flexWrap: "wrap",
-            }}
-          >
-            <Text>Buddy</Text>
-            <Text>Adopted on Jan 22, 2025</Text>
-            <Text>
-              Buddy is a loving and playful dog looking for a forever home.
-            </Text>
-          </View>
-        </View>
-      </View> */}
+
       <Text
         style={{
           fontSize: 20,
@@ -161,18 +147,19 @@ const Profile = () => {
           </Text>
           <AntDesign name="right" size={20} color="black" />
         </View>
-        <View
+        <Pressable
           style={{
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
           }}
+          onPress={handleLogout}
         >
           <Text style={{ flex: 1, fontFamily: "Poppins_400Regular" }}>
             Logout
           </Text>
           <AntDesign name="right" size={20} color="black" />
-        </View>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

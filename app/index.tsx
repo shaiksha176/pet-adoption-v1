@@ -8,40 +8,14 @@ import {
 import React from "react";
 import { Link, Redirect, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Provider } from "react-redux";
-import { store } from "@/redux/store";
 
 const IntroScreen = () => {
   const navigation = useNavigation();
   const handlePress = () => {
     navigation.navigate("register/index" as never);
   };
-  // return (
-  //   <SafeAreaView style={styles.container}>
-  //     <Image
-  //       source={require("../assets/images/intro_image.png")}
-  //       style={{ width: 300, height: 300 }}
-  //     />
-  //     <Text style={styles.heading}>Pet Connect</Text>
-  //     <Text style={styles.subHeading}>Find your perfect furry friend</Text>
 
-  //     <TouchableOpacity style={styles.button} onPress={handlePress}>
-  //       <Text style={styles.buttonText}>Get Started</Text>
-  //     </TouchableOpacity>
-  //     {/* <Link href="/register/" style={styles.link}>
-  //       <Text style={styles.linkText}>Go to Signup screen!</Text>
-  //     </Link>
-  //     <Link href="/(tabs)/">
-  //       <Text style={styles.linkText}>Go to Tabs!</Text>
-  //     </Link> */}
-  //   </SafeAreaView>
-  // );
-
-  return (
-    <Provider store={store}>
-      <Redirect href={"/(tabs)/home"} />
-    </Provider>
-  );
+  return <Redirect href={"/login/"} />;
 };
 
 export default IntroScreen;

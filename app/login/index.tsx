@@ -6,37 +6,66 @@ import {
   Image,
   TextInput,
   Pressable,
+  Alert,
+  KeyboardAvoidingView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { useLoginMutation } from "@/redux/api/userApiSlice";
+import { useRouter } from "expo-router";
+import {
+  setCredentials,
+  logout,
+  checkAuthStatus,
+} from "@/redux/features/user/authSlice";
+import { AppDispatch } from "@/redux/store";
+
+// import { useLoginMutation } from "@/redux/api/usersApiSlice";
 const Signup = () => {
   const navigation = useNavigation();
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { user, isLoading: isUserDataLoading } = useSelector(
+    (state: any) => state.auth,
+  );
+  // console.log({ username });
+  const [login, { isLoading, isSuccess: isLoginSuccessful, isError, error }] =
+    useLoginMutation();
+  // const [] = useLoginMutation();
   const handlePress = () => {
     navigation.navigate("login/index" as never);
   };
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [experience, setExperience] = useState("");
-  const [reason, setReason] = useState("");
+  const [password, setPassword] = useState("");
 
   // Handle form submission
-  const handleSubmit = () => {
-    // Add your logic for form submission (e.g., sending data to a server)
-    console.log(fullName);
-    // Reset the form after submission
-    setFullName("");
-    setEmail("");
-    setPhone("");
-    setAddress("");
-    setExperience("");
-    setReason("");
-
-    // Display a success message or navigate to another screen
+  const handleSubmit = async () => {
+    console.log("handle submit called");
+    if (!email || !password) {
+      Alert.alert("Please fill out all fields");
+      return;
+    }
+    // TODO: Send data to server and handle response (show error or success message)
+    try {
+      const res = await login({ email, password }).unwrap();
+      // console.log(res);
+      dispatch(setCredentials(res));
+      router.replace("/(tabs)/home");
+    } catch (error: any) {
+      if (error?.message == "Aborted") {
+        return Alert.alert("Login failed. Please try again");
+      }
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      return router.replace("/(tabs)/home/");
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -48,38 +77,47 @@ const Signup = () => {
         <Text style={styles.heading}>Log In</Text>
         <Text style={styles.subHeading}>Sign In to continue</Text>
       </View>
-
-      <View style={styles.form}>
-        <View style={{ position: "relative" }}>
-          <Text style={styles.label}>Email *</Text>
-          <TextInput style={styles.input} />
-          <FontAwesome
-            name="paw"
-            size={24}
-            color="black"
-            style={{ position: "absolute", right: 10, top: 50 }}
-          />
+      <KeyboardAvoidingView keyboardVerticalOffset={-500} behavior="padding">
+        <View style={styles.form}>
+          <View style={{ position: "relative" }}>
+            <Text style={styles.label}>Email *</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
+            <FontAwesome
+              name="paw"
+              size={24}
+              color="black"
+              style={{ position: "absolute", right: 10, top: 50 }}
+            />
+          </View>
+          <View style={{ position: "relative" }}>
+            <Text style={styles.label}>Password *</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
+            />
+            <FontAwesome
+              name="lock"
+              size={24}
+              color="black"
+              style={{ position: "absolute", right: 10, top: 50 }}
+            />
+          </View>
+          <Pressable style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>LOG IN</Text>
+          </Pressable>
+          <Text style={styles.loginAlert}>
+            Don't have an account ?
+            <Link asChild href="/register/">
+              <Text style={styles.loginAlertBold}> Sign up</Text>
+            </Link>
+          </Text>
         </View>
-        <View style={{ position: "relative" }}>
-          <Text style={styles.label}>Password *</Text>
-          <TextInput style={styles.input} />
-          <FontAwesome
-            name="lock"
-            size={24}
-            color="black"
-            style={{ position: "absolute", right: 10, top: 50 }}
-          />
-        </View>
-        <Pressable style={styles.button} onPress={handlePress}>
-          <Text style={styles.buttonText}>LOG IN</Text>
-        </Pressable>
-        <Text style={styles.loginAlert}>
-          Don't have an account ?
-          <Link asChild href="/register/">
-            <Text style={styles.loginAlertBold}> Sign up</Text>
-          </Link>
-        </Text>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };

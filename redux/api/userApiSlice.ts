@@ -8,6 +8,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `${USERS_URL}/login`,
         method: "POST",
         body: data,
+        timeout: 5000,
       }),
     }),
     register: builder.mutation({
@@ -25,7 +26,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
     }),
     profile: builder.mutation({
       query: (data) => ({
-        url: `${USERS_URL}/${data.userId}`,
+        url: `${USERS_URL}/profile`,
         method: "PUT",
         body: data,
       }),
@@ -58,6 +59,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["User"],
     }),
   }),
+  overrideExisting: true,
 });
 
 export const {

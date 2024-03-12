@@ -6,10 +6,11 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useSelector } from "react-redux";
 
 interface UploadedBy {
   _id: string;
@@ -67,7 +68,12 @@ const PetList: React.FC = () => {
 
 const Pets: React.FC = () => {
   const router = useRouter();
-  const [pets, setPets] = useState<Pet[] | []>([]); // Initialize with null
+  const [pets, setPets] = useState<Pet[] | []>([]);
+  const userInfo = useSelector((state: any) => state.auth.user);
+  useEffect(() => {
+    console.log(userInfo);
+  }, []);
+
   const navigateToPetAdditionScreen = () => {
     router.push("/pet form/");
   };

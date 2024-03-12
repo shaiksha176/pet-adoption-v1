@@ -16,6 +16,8 @@ import {
   Poppins_400Regular,
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
+import { Provider } from "react-redux";
+import store from "@/redux/store";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -61,48 +63,49 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    // <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-    <ThemeProvider value={DefaultTheme}>
-      {/* <StatusBar barStyle="dark-content" /> */}
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="login/index"
-          options={{
-            headerTitle: "Login",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="index"
-          options={{ headerTitle: "Home", headerShown: false }}
-        />
-        <Stack.Screen
-          name="register/index"
-          options={{ headerTitle: "Sign Up" }}
-        />
-        <Stack.Screen
-          name="category/index"
-          options={{ headerTitle: "Category" }}
-        />
-        <Stack.Screen
-          name="category/[id]"
-          options={{ headerTitle: "Pet Details" }}
-        />
-        <Stack.Screen
-          name="adoption form/index"
-          options={{ headerTitle: "Adoption Form" }}
-        />
-        <Stack.Screen
-          name="foster form/index"
-          options={{ headerTitle: "Foster Form" }}
-        />
-        <Stack.Screen
-          name="pet form/index"
-          options={{ headerTitle: "Pet Addition Form" }}
-        />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      </Stack>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider value={DefaultTheme}>
+        {/* <StatusBar barStyle="dark-content" /> */}
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="login/index"
+            options={{
+              headerTitle: "Login",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="index"
+            options={{ headerTitle: "Home", headerShown: false }}
+          />
+          <Stack.Screen
+            name="register/index"
+            options={{ headerTitle: "Sign Up" }}
+          />
+          <Stack.Screen
+            name="category/index"
+            options={{ headerTitle: "Category" }}
+          />
+          <Stack.Screen
+            name="category/[id]"
+            options={{ headerTitle: "Pet Details" }}
+          />
+          <Stack.Screen
+            name="adoption form/index"
+            options={{ headerTitle: "Adoption Form" }}
+          />
+          <Stack.Screen
+            name="foster form/index"
+            options={{ headerTitle: "Foster Form" }}
+          />
+          <Stack.Screen
+            name="pet form/index"
+            options={{ headerTitle: "Pet Addition Form" }}
+          />
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        </Stack>
+      </ThemeProvider>
+    </Provider>
   );
 }
