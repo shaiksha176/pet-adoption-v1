@@ -22,6 +22,8 @@ import {
   checkAuthStatus,
 } from "@/redux/features/user/authSlice";
 import { AppDispatch } from "@/redux/store";
+import axios from "axios";
+import { BASE_URL, USERS_URL } from "@/constants/Urls";
 
 // import { useLoginMutation } from "@/redux/api/usersApiSlice";
 const Signup = () => {
@@ -51,7 +53,7 @@ const Signup = () => {
     // TODO: Send data to server and handle response (show error or success message)
     try {
       const res = await login({ email, password }).unwrap();
-      // console.log(res);
+      console.log(res);
       dispatch(setCredentials(res));
       router.replace("/(tabs)/home");
     } catch (error: any) {
@@ -59,6 +61,16 @@ const Signup = () => {
         return Alert.alert("Login failed. Please try again");
       }
     }
+
+    // try {
+    //   const { data } = await axios.post(BASE_URL + USERS_URL + "/login", {
+    //     email,
+    //     password,
+    //   });
+    //   console.log(data);
+    // } catch (error) {
+    //   console.log(error);
+    // } 
   };
 
   useEffect(() => {

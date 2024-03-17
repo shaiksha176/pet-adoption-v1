@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLazyGetPetsUploadedByUserQuery } from "@/redux/api/petApiSlice";
 import { AppDispatch } from "@/redux/store";
 import { setUserPets } from "@/redux/features/pets/petSlice";
+import axios from "axios";
+import { BASE_URL, PET_URL } from "@/constants/Urls";
 
 interface UploadedBy {
   _id: string;
@@ -46,6 +48,10 @@ interface Pet {
   fosteringHistory?: FosteringHistoryItem[]; // Make optional
 }
 
+interface PetListProps {
+  pets: Pet[];
+}
+
 const NoPets: React.FC = () => {
   return (
     <View
@@ -65,15 +71,26 @@ const NoPets: React.FC = () => {
   );
 };
 
-const PetList: React.FC = () => {
+const PetList: React.FC<PetListProps> = ({ pets }: any) => {
   const userPets = useSelector((state: any) => state.pets.uploadedPets);
-  useFocusEffect(() => {
-    userPets[0];
-  });
+  console.log(JSON.stringify(userPets, null, 2));
+  // useFocusEffect(() => {
+  //   pets[0];
+  // });
+  const router = useRouter();
   return (
     <View>
       {userPets.map((item: any, index: number) => (
-        <Pressable style={styles.popularPetCard} key={index}>
+        <Pressable
+          style={styles.popularPetCard}
+          key={index}
+          onPress={() => {
+            router.push({
+              pathname: "/applications/",
+              params: { petDetails: JSON.stringify(item) },
+            });
+          }}
+        >
           <Image
             source={{ uri: item.images[0] }}
             style={styles.popularPetImage}
@@ -95,6 +112,9 @@ const PetList: React.FC = () => {
               <Text style={styles.popularPetCategory}>
                 {item.size} | {item.age}
               </Text>
+              <Text style={styles.popularPetCategory}>
+                {item.requests.length} applications received
+              </Text>
             </View>
           </View>
         </Pressable>
@@ -106,7 +126,7 @@ const PetList: React.FC = () => {
 const Pets: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const [pets, setPets] = useState<Pet[] | []>([]);
+  const [pets, setPets] = useState([]);
   const userInfo = useSelector((state: any) => state.auth.user);
   const userUploadedPets = useSelector((state: any) => state.pets.uploadedPets);
   const [
@@ -115,22 +135,34 @@ const Pets: React.FC = () => {
   ] = useLazyGetPetsUploadedByUserQuery();
 
   useEffect(() => {
+    // console.log("useeffect called");
     if (!userInfo) return;
+    console.log("useeffect called");
+
     const fetchUserPets = async () => {
-      await getPetsUploadedByUser(userInfo.id).unwrap();
-      console.log({ isSuccess, isError, isLoading });
-      if (isSuccess) {
-        dispatch(setUserPets(petsUploadedByUser));
+      // await getPetsUploadedByUser(userInfo.id).unwrap();
+      // console.log(petsUploadedByUser);
+      // console.log({ isSuccess, isError, isLoading });
+      // setPets(petsUploadedByUser);
+      // if (isSuccess) {
+      //   dispatch(setUserPets(petsUploadedByUser));
+      // }
+      try {
+        // const { data } = await axios.get(
+        //   "http://10.0.2.2:8080/api/pets/user/" + userInfo.id,
+        // );
+        const { data } = await axios.get(
+          `${BASE_URL}${PET_URL}/user/${userInfo.id}`,
+        );
+        console.log("user pet data received");
+        setPets(data);
+        dispatch(setUserPets(data));
+      } catch (error) {
+        console.log(error);
       }
     };
     fetchUserPets();
   }, []);
-
-  useFocusEffect(() => {
-    console.log(userInfo);
-    // console.log(userUploadedPets);
-    // console.log({ isSuccess, isError, isLoading });
-  });
 
   const navigateToPetAdditionScreen = () => {
     router.push("/pet form/");
@@ -167,7 +199,7 @@ const Pets: React.FC = () => {
           </Pressable>
         </View>
 
-        {!userUploadedPets?.length ? <NoPets /> : <PetList />}
+        {!userUploadedPets?.length ? <NoPets /> : <PetList pets={pets} />}
       </ScrollView>
     </SafeAreaView>
   );

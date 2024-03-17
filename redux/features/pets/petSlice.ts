@@ -12,10 +12,13 @@ const petsSlice = createSlice({
     setUserPets: (state, action) => {
       state.uploadedPets = action.payload;
     },
+    setPets: (state, action) => {
+      state.pets = action.payload;
+    },
   },
   extraReducers: (builder) => {},
 });
 
-export const { setUserPets } = petsSlice.actions;
+export const { setUserPets, setPets } = petsSlice.actions;
 
 export default petsSlice.reducer;

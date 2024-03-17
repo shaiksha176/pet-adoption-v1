@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -17,6 +17,8 @@ import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
 
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { BASE_URL, PET_URL } from "@/constants/Urls";
 interface PetDetails {
   name: string;
   age: string;
@@ -55,9 +57,9 @@ const PetForm = () => {
     description: "",
   });
   const [singleFile, setSingleFile] = useState(null);
-
+  const user = useSelector((state: any) => state.auth.user);
+  const router = useRouter();
   useEffect(() => {
-    console.log("useeffect called");
     ensureDirExists();
   }, []);
 
@@ -152,9 +154,9 @@ const PetForm = () => {
         name: singleFile[0].name,
         type: singleFile[0].mimeType,
       });
-
+      data.append("uploadedBy", user.id);
       try {
-        let res = await fetch("http://192.168.1.16:8080/api/pets", {
+        let res = await fetch(`${BASE_URL}${PET_URL}`, {
           method: "post",
           body: data,
           headers: {
@@ -162,12 +164,12 @@ const PetForm = () => {
             "Content-Type": "multipart/form-data",
           },
         });
-        console.log(res);
         let result = await res.json();
-        console.log("result", result);
-        if (result.status == 200) {
-          Alert.alert("Info", result.msg);
-        }
+        // console.log(JSON.stringify(result, null, 2));
+        // if (result.status == 200) {
+        Alert.alert("Info", "Pet added successfully");
+        router.replace("/(tabs)/pets/");
+        // }
       } catch (error) {
         console.log("error upload", error);
       }

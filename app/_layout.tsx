@@ -103,6 +103,14 @@ function RootLayoutNav() {
             name="pet form/index"
             options={{ headerTitle: "Pet Addition Form" }}
           />
+          <Stack.Screen
+            name="pet details/index"
+            options={{ headerTitle: "Pet Details" }}
+          />
+          <Stack.Screen
+            name="applications/index"
+            options={{ headerTitle: "Applications" }}
+          />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         </Stack>
       </ThemeProvider>

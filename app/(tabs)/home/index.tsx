@@ -18,12 +18,19 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { BASE_URL, PET_URL } from "@/constants/Urls";
+import { AppDispatch } from "@/redux/store";
+import { setPets } from "@/redux/features/pets/petSlice";
+
 const Home = () => {
   const router = useRouter();
   const user = useSelector((state: any) => state.auth.user);
+  const pets = useSelector((state: any) => state.pets.pets);
   const [currentUserWishlistedPets, setCurrentUserWishlistedPets] =
     React.useState([]);
+  const dispatch = useDispatch<AppDispatch>();
   // Fetch wishlisted items for the current user when the component mounts
   React.useEffect(() => {
     async function fetchCurrentUserWishlistedPets() {
@@ -43,11 +50,23 @@ const Home = () => {
       }
     }
 
+    const fetchAllPetsExceptUsers = async () => {
+      try {
+        const { data } = await axios.get(`${BASE_URL}${PET_URL}`);
+        console.log(JSON.stringify(data, null, 2));
+        dispatch(setPets(data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchAllPetsExceptUsers();
+
     fetchCurrentUserWishlistedPets();
   }, []);
 
   const isPetWishlistedByCurrentUser = (pet: any) => {
-    return currentUserWishlistedPets.some((p: any) => p.id === pet.id);
+    return currentUserWishlistedPets.some((p: any) => p._id === pet._id);
   };
 
   const handleWishlist = (pet: any): any => {
@@ -209,7 +228,42 @@ const Home = () => {
       <ScrollView style={{ padding: 10 }}>
         <Text style={styles.heading}>Popular Pets</Text>
 
-        {popularPets.map((item, index) => (
+        {pets?.map((item: any, index: number) => (
+          <Pressable style={styles.popularPetCard} key={index}>
+            <Image
+              source={{ uri: item.images[0] }}
+              style={styles.popularPetImage}
+            />
+            <View
+              style={{
+                padding: 10,
+                borderStyle: "solid",
+                borderColor: "gray",
+                borderWidth: 1,
+                borderTopWidth: 0,
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "white",
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={styles.popularPetName}>{item.name}</Text>
+                <Text style={styles.popularPetCategory}>
+                  {item.size} | {item.age}
+                </Text>
+              </View>
+              <Pressable onPress={() => handleWishlist(item)}>
+                {isPetWishlistedByCurrentUser(item) ? (
+                  <AntDesign name="heart" size={24} color="red" />
+                ) : (
+                  <AntDesign name="hearto" size={24} color="black" />
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        ))}
+
+        {/* {popularPets.map((item, index) => (
           <Pressable style={styles.popularPetCard} key={index}>
             <Image source={item.image} style={styles.popularPetImage} />
             <View
@@ -239,7 +293,7 @@ const Home = () => {
               </Pressable>
             </View>
           </Pressable>
-        ))}
+        ))} */}
         <Text style={styles.heading}>Categories</Text>
         <View
           style={{

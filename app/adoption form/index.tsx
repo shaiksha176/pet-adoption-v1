@@ -8,9 +8,11 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { useSelector } from "react-redux";
 
 const AdoptionForm = () => {
   const { id: petID, name: petName } = useLocalSearchParams();
+  const user = useSelector((state: any) => state.auth.user);
   // console.log({ petID, petName });
   // Form state
   const [fullName, setFullName] = useState("");
@@ -21,8 +23,14 @@ const AdoptionForm = () => {
   const [reason, setReason] = useState("");
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     // Add your logic for form submission (e.g., sending data to a server)
+
+    try {
+      
+    } catch (error) {
+      
+    }
     console.log(fullName);
     // Reset the form after submission
     setFullName("");
